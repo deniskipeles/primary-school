@@ -26,7 +26,9 @@
 	import { Side, Nav, Responsive } from 'svelte-sidebar-menu';
 
 	import { quartInOut } from 'svelte/easing';
-  	import StudentSideBar from '$lib/StudentSideBar.svelte';
+  	import StudentSideBar from '$lib/components/StudentSideBar.svelte';
+  	import {CONSTANTS} from '$lib/CONSTANTS.js';
+  
 
 	// Darkmode component
 	let btnClass =
@@ -76,12 +78,31 @@
 		{ href: '/test2', name: 'Notes' },
 		{ href: '/about', name: 'About Us' }
 	];
+
+	import { school } from "$lib/store/school";
+	import { supabase } from "$lib/supabase";
+	import { onMount } from 'svelte';
+  	import Footer from '$lib/components/Footer.svelte';
+
+	onMount(async()=>{
+		let { data: schoolData, error } = await supabase
+			.from('schools')
+			.select("*")
+			// Filters
+			.eq('id', CONSTANTS.school)
+			.limit(1)
+			.single()
+		school.set(schoolData)
+		console.log(schoolData,error)
+	})
+
+
 </script>
 
 <DarkMode {btnClass} />
 <Responsive />
 <Side
-	{siteName}
+	siteName={$school ? $school.logo_name : "primary school"}
 	{siteClass}
 	{headerClass}
 	{hamburgerClass}
@@ -100,10 +121,11 @@
 </Side>
 <main class="container mx-auto py-32 px-8 lg:pl-80 pr-8 dark:text-white ">
 	<slot />
+	<Footer/>
 </main>
 
 <svelte:head>
-	<title>Flowbite-Svelte-Starter</title>
+	<title>{$school ? $school.name : "school name"}</title>
 	<meta
 		name="description"
 		content="Flowbite-Svelte-Starter is a quick way to start Svelte and Flowbite/Tailwind CSS. It comes with SvelteKit, Tailwind CSS, Flowbite,
