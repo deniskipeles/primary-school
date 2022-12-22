@@ -74,8 +74,8 @@
 	};
 
 	const topMenuList = [
-		{ href: '/test1', name: 'Questions' },
-		{ href: '/test2', name: 'Notes' },
+		{ href: '/questions', name: 'Questions' },
+		{ href: '/notes', name: 'Notes' },
 		{ href: '/about', name: 'About Us' }
 	];
 
