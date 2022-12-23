@@ -28,6 +28,14 @@
 	import { quartInOut } from 'svelte/easing';
   	import StudentSideBar from '$lib/components/StudentSideBar.svelte';
   	import {CONSTANTS} from '$lib/CONSTANTS.js';
+
+
+	import { school } from "$lib/store/school";
+	import { user } from "$lib/store/user";
+	import { supabase } from "$lib/supabase";
+	import { onMount } from 'svelte';
+  	import Footer from '$lib/components/Footer.svelte';
+  import { afterNavigate } from '$app/navigation';
   
 
 	// Darkmode component
@@ -73,16 +81,20 @@
 		x: -200
 	};
 
-	const topMenuList = [
+	$: topMenuList = [
 		{ href: '/questions', name: 'Questions' },
 		{ href: '/notes', name: 'Notes' },
 		{ href: '/login', name: 'Sign in' }
 	];
 
-	import { school } from "$lib/store/school";
-	import { supabase } from "$lib/supabase";
-	import { onMount } from 'svelte';
-  	import Footer from '$lib/components/Footer.svelte';
+	if ($user != null) {
+		topMenuList = [
+			{ href: '/questions', name: 'Questions' },
+			{ href: '/notes', name: 'Notes' },
+		];
+	}
+
+	
 
 	onMount(async()=>{
 		let { data: schoolData, error } = await supabase
@@ -93,11 +105,43 @@
 			.limit(1)
 			.single()
 		school.set(schoolData)
-		console.log(schoolData,error)
+		
+		const { data: { user:u } } = await supabase.auth.getUser()
+		user.set(u)
+		// console.log(u)
+
 	})
 
 
+
+	let width;
+  let breakPoint = 1024;
+  let drawerHidden = false;
+  let activateClickOutside = true;
+  onMount(() => {
+    if (width >= breakPoint) {
+      drawerHidden = false;
+      activateClickOutside = false;
+    } else {
+      drawerHidden = true;
+      activateClickOutside = true;
+    }
+  });
+  $: if (width >= breakPoint) {
+    drawerHidden = false;
+    activateClickOutside = false;
+  } else {
+    drawerHidden = true;
+    activateClickOutside = true;
+  }
+
+
+
 </script>
+
+
+
+<svelte:window bind:innerWidth={width} />
 
 <DarkMode {btnClass} />
 <Responsive />
@@ -119,10 +163,18 @@
 		<StudentSideBar/>
 	</Nav>
 </Side>
-<main class="container mx-auto py-32 px-8 lg:pl-80 pr-8 dark:text-white ">
-	<slot />
-	<Footer/>
-</main>
+
+
+<div class="flex px-4 mx-auto w-full">
+	<main class="container1 mx-auto my-auto py-32 px-8 lg:pl-80 pr-8 dark:text-white ">
+		<slot />
+		<Footer/>
+	</main>
+
+</div>
+
+
+
 
 <svelte:head>
 	<title>{$school ? $school.name : "school name"}</title>

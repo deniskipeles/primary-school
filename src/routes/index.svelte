@@ -12,11 +12,11 @@
   
   
   
-  <div class="max-w-4xl">
+  <!-- <div class="max-w-4xl">
 	
-  </div>
+  </div> -->
   
-  <section class="mb-20 text-gray-700  px-8" >
+  <section class="mb-20 text-gray-700  px-81" >
 	  <div class="text-center md:max-w-xl lg:max-w-3xl mx-auto">
 		<h3 class="text-3xl font-bold mb-6 text-gray-800">Teachers</h3>
 		<p class="mb-6 pb-2 md:mb-12 md:pb-0">

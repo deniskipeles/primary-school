@@ -1,5 +1,6 @@
 <script>
   import { user } from "$lib/store/user";
+  import { supabase } from "$lib/supabase";
 
 
   import { Sidebar, SidebarDropdownItem, SidebarDropdownWrapper, SidebarGroup, SidebarItem, SidebarWrapper } from "flowbite-svelte";
@@ -18,6 +19,21 @@
 	} from 'svelte-heros';
    let spanClass =
 		'pl-2 self-center text-lg font-semibold text-gray-900 whitespace-nowrap dark:text-white';
+
+
+
+    async function logout() {
+        try {
+            let { error } = await supabase.auth.signOut()
+            user.set(null)
+            console.log('Successfully logged out')
+            if (error) {
+                console.error(error)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
 </script>
 <div>
@@ -95,12 +111,14 @@
                 />
                 {#if $user}
                     <SidebarItem
+                        on:click={logout}
                         label="Logout"
-                        icon={{ name: Logout, class: 'text-pink-500 mr-2 dark:text-blue-500' }}
+                        icon={{ name: Logout, class: 'text-green-500 mr-2 dark:text-yellow-500' }}
                     />
                 {/if}
                 {#if $user == null}
                     <SidebarItem
+                        href={`/login`}
                         label="Sign In"
                         icon={{ name: Login, class: 'text-green-500 mr-2 dark:text-yellow-500' }}
                     />
