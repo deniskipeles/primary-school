@@ -76,7 +76,7 @@
 	const topMenuList = [
 		{ href: '/questions', name: 'Questions' },
 		{ href: '/notes', name: 'Notes' },
-		{ href: '/about', name: 'About Us' }
+		{ href: '/login', name: 'Sign in' }
 	];
 
 	import { school } from "$lib/store/school";

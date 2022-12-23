@@ -33,13 +33,22 @@
                     icon={{ name: ShoppingCart, class: 'text-blue-500 mr-2 dark:text-pink-500' }}
                 >
                     <SidebarDropdownItem label="Syllabus" />
-                    <SidebarDropdownItem label="Class Mates" />
-                    <SidebarDropdownItem label="Class Teachers" />
+                    <SidebarDropdownItem label="Class Students" />
+                    <SidebarDropdownItem label="Create Notes" />
+                </SidebarDropdownWrapper>
+                <SidebarDropdownWrapper
+                    label="Students"
+                    icon={{ name: ShoppingCart, class: 'text-blue-500 mr-2 dark:text-pink-500' }}
+                >
+                    <SidebarDropdownItem label="View" />
+                    <SidebarDropdownItem label="Add Student" />
+                    <SidebarDropdownItem label="Student Fees Statement" />
                 </SidebarDropdownWrapper>
                 <SidebarDropdownWrapper
                     label="Exams"
                     icon={{ name: ShoppingCart, class: 'text-blue-500 mr-2 dark:text-pink-500' }}
                 >
+                    <SidebarDropdownItem label="Set Exams" />
                     <SidebarDropdownItem label="Results" />
                     <SidebarDropdownItem label="Marks" />
                     <SidebarDropdownItem label="CATs" />
@@ -50,21 +59,10 @@
                 >
                     <SidebarDropdownItem label="Results" />
                     <!-- consist of test,questions and answers -->
-                    <SidebarDropdownItem label="Take Test" />
-                    <SidebarDropdownItem label="Contest" />
+                    <SidebarDropdownItem label="Set Test" />
+                    <SidebarDropdownItem label="Set Contest" />
                 </SidebarDropdownWrapper>
-                <SidebarItem
-                    label="Fee Statement"
-                    {spanClass}
-                    icon={{ name: ViewGrid, class: 'text-green-500 mr-2 dark:text-purple-500' }}
-                >
-                    <svelte:fragment slot="subtext">
-                        <span
-                            class="inline-flex justify-center items-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-200 rounded-full dark:bg-gray-700 dark:text-gray-300"
-                            >Pro</span
-                        >
-                    </svelte:fragment>
-                </SidebarItem>
+                
                 <SidebarItem
                     label="Library"
                     {spanClass}
@@ -81,6 +79,10 @@
                     label="Home"
                     icon={{ name: User, class: 'text-blue-500 mr-2 dark:text-pink-500' }}
                 />
+                <SidebarItem
+                    label="Subjects"
+                    icon={{ name: User, class: 'text-blue-500 mr-2 dark:text-pink-500' }}
+                />
                 {#if $user}
                     <SidebarItem
                         label="Logout"
@@ -89,7 +91,6 @@
                 {/if}
                 {#if $user == null}
                     <SidebarItem
-                        href={`/login`}
                         label="Sign In"
                         icon={{ name: Login, class: 'text-green-500 mr-2 dark:text-yellow-500' }}
                     />

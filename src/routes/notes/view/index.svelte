@@ -1,122 +1,87 @@
-<script>
-    // If absolute URL from the remote server is provided, configure the CORS
-// header on that server.
-var url = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf';
+<script lang="ts">
+	import { browser } from '$app/environment';
+	import { base } from '$app/paths';
 
-// Loaded via <script> tag, create shortcut to access PDF.js exports.
-let pdfjsLib
-onMount(()=>{
-  pdfjsLib = window['pdfjs-dist/build/pdf'];
+	import { Document, Page, preferThisHeight, type MultipleOf90 } from 'svelte-pdfjs';
 
-})
+	let scale = 1;
+	let num = 1;
+	let filename = 'https://www.africau.edu/images/default/sample.pdf';
+	let max_pages = 1;
+	let renderTextLayer = false;
+	let target_height = 500;
+	let rotation: MultipleOf90 = 0;
 
-// The workerSrc property shall be specified.
-pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
-
-var pdfDoc = null,
-    pageNum = 1,
-    pageRendering = false,
-    pageNumPending = null,
-    scale = 0.8,
-    canvas = document.getElementById('the-canvas'),
-    ctx = canvas.getContext('2d');
-
-/**
- * Get page info from document, resize canvas accordingly, and render page.
- * @param num Page number.
- */
-function renderPage(num) {
-  pageRendering = true;
-  // Using promise to fetch the page
-  pdfDoc.getPage(num).then(function(page) {
-    var viewport = page.getViewport({scale: scale});
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-
-    // Render PDF page into canvas context
-    var renderContext = {
-      canvasContext: ctx,
-      viewport: viewport
-    };
-    var renderTask = page.render(renderContext);
-
-    // Wait for rendering to finish
-    renderTask.promise.then(function() {
-      pageRendering = false;
-      if (pageNumPending !== null) {
-        // New page rendering is pending
-        renderPage(pageNumPending);
-        pageNumPending = null;
-      }
-    });
-  });
-
-  // Update page counters
-  document.getElementById('page_num').textContent = num;
-}
-
-/**
- * If another page rendering in progress, waits until the rendering is
- * finised. Otherwise, executes rendering immediately.
- */
-function queueRenderPage(num) {
-  if (pageRendering) {
-    pageNumPending = num;
-  } else {
-    renderPage(num);
-  }
-}
-
-/**
- * Displays previous page.
- */
-function onPrevPage() {
-  if (pageNum <= 1) {
-    return;
-  }
-  pageNum--;
-  queueRenderPage(pageNum);
-}
-document.getElementById('prev').addEventListener('click', onPrevPage);
-
-/**
- * Displays next page.
- */
-function onNextPage() {
-  if (pageNum >= pdfDoc.numPages) {
-    return;
-  }
-  pageNum++;
-  queueRenderPage(pageNum);
-}
-document.getElementById('next').addEventListener('click', onNextPage);
-
-/**
- * Asynchronously downloads PDF.
- */
-pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-  pdfDoc = pdfDoc_;
-  document.getElementById('page_count').textContent = pdfDoc.numPages;
-
-  // Initial/first page rendering
-  renderPage(pageNum);
-});
-
+	let sizing = 1;
 </script>
 
-<svelte:head>
-  <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
-</svelte:head>
+<section class="settings">
+	Page <input type="number" bind:value={num} step="1" min="1" max={max_pages} /> of {max_pages}
 
+	<select bind:value={filename}>
+		<option>tackling-ts-preview-book.pdf</option>
+		<option>impatient-js-preview-book.pdf</option>
+		<option value="a.pdf">non existent file</option>
+	</select>
 
+	<input type="checkbox" bind:checked={renderTextLayer} /> Render text layer
 
-<h1>PDF.js Previous/Next example</h1>
+	<fieldset>
+		<legend>Dimensions</legend>
+		<select bind:value={sizing}>
+			<option value={1}>Scale: {scale}x</option>
+			<option value={2}>
+				Fixed height: {target_height}px
+			</option>
+		</select>
 
-<div>
-  <button id="prev">Previous</button>
-  <button id="next">Next</button>
-  &nbsp; &nbsp;
-  <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-</div>
+		{#if sizing === 2}
+			<input type="range" bind:value={target_height} min="200" max="700" step="50" />
+		{:else}
+			<input type="range" bind:value={scale} min="0.5" max="4" step="0.25" />
+		{/if}
 
-<canvas id="the-canvas"></canvas>
+		<label>
+			Rotation
+			<select bind:value={rotation}>
+				<option>0</option>
+				<option>90</option>
+				<option>180</option>
+				<option>270</option>
+			</select>
+		</label>
+	</fieldset>
+</section>
+
+{#if browser}
+	<!-- {base}/ isn't neceassary if your app lives at the root of your host. 
+	---- However we're serving this demo through github pages so the pdfs will
+	---- be at /svelte-pdfjs/filename.pdf
+	-->
+	<Document
+		file="{base}/{filename}"
+		loadOptions={{ docBaseUrl: base }}
+		on:loadsuccess={(e) => {
+			max_pages = e.detail.numPages;
+			num = Math.min(num, max_pages);
+		}}
+		on:loaderror={(e) => alert(e.detail + '')}
+	>
+		<div>
+			<Page
+				{scale}
+				{num}
+				{renderTextLayer}
+				{rotation}
+				getViewport={sizing === 1 ? undefined : preferThisHeight(target_height)}
+			/>
+		</div>
+	</Document>
+{/if}
+
+<style>
+	div {
+		display: grid;
+		place-items: center;
+	}
+</style>
